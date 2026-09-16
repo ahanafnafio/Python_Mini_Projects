@@ -1,0 +1,366 @@
+from flask import Flask, render_template_string
+
+app = Flask(__name__)
+
+HTML_TEMPLATE = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ahanaf Akif Islam | Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1d;
+            --bg-card: #111827;
+            --bg-card-hover: #1f2937;
+            --accent: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.15);
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border: #374151;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 2.5rem 1rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Hero Header */
+        .hero {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5);
+        }
+
+        .avatar-container {
+            flex-shrink: 0;
+        }
+
+        .avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--accent);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .hero-text h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .hero-text .title {
+            color: var(--accent);
+            font-weight: 500;
+            margin-top: 0.25rem;
+            font-size: 1.05rem;
+        }
+
+        .hero-text .bio {
+            color: var(--text-muted);
+            margin-top: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .links {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.25rem;
+            flex-wrap: wrap;
+        }
+
+        .badge-link {
+            text-decoration: none;
+            color: var(--text-main);
+            background: #1e293b;
+            border: 1px solid var(--border);
+            padding: 0.4rem 0.9rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .badge-link:hover {
+            border-color: var(--accent);
+            background: var(--accent-glow);
+            color: var(--accent);
+        }
+
+        /* Sections */
+        section {
+            margin-top: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #fff;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        /* Grid Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: border-color 0.2s ease;
+        }
+
+        .card:hover {
+            border-color: #4b5563;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #f9fafb;
+        }
+
+        .card-subtitle {
+            color: var(--accent);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .card-date {
+            color: var(--text-muted);
+            font-size: 0.825rem;
+        }
+
+        ul.bullets {
+            list-style: none;
+            margin-top: 0.85rem;
+        }
+
+        ul.bullets li {
+            position: relative;
+            padding-left: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.92rem;
+        }
+
+        ul.bullets li::before {
+            content: "▹";
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+        }
+
+        /* Pill tags */
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+            margin-top: 0.5rem;
+        }
+
+        .tag {
+            background: #1f2937;
+            color: #e5e7eb;
+            font-size: 0.78rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            border: 1px solid #374151;
+        }
+
+        @media (max-width: 640px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+            }
+            .links {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header / About Me -->
+    <header class="hero">
+        <div class="avatar-container">
+            <img src="/static/profile.jpg" alt="Ahanaf Akif Islam" class="avatar" onerror="this.src='https://github.com/ahanafnafio.png'">
+        </div>
+        <div class="hero-text">
+            <h1>Ahanaf Akif Islam</h1>
+            <p class="title">B.S. in Computer Science | Software Developer & Researcher</p>
+            <p class="bio">
+                Focused on cybersecurity, systems programming, backend architectures, and inclusive technology. 
+                Dedicated to solving real-world challenges with high-performance, secure software.
+            </p>
+            <div class="links">
+                <a class="badge-link" href="https://github.com/ahanafnafio" target="_blank">GitHub: ahanafnafio</a>
+                <a class="badge-link" href="https://linkedin.com/in/ahanaf-akif-57a97928b" target="_blank">LinkedIn</a>
+                <a class="badge-link" href="mailto:ahanafnafio@gmail.com">ahanafnafio@gmail.com</a>
+                <span class="badge-link">Denton, TX</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Education -->
+    <section>
+        <h2 class="section-title">Education</h2>
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title">University of North Texas</h3>
+                    <p class="card-subtitle">Bachelor of Science in Computer Science &bull; GPA: 4.0 / 4.0</p>
+                </div>
+                <span class="card-date">Expected Dec 2028</span>
+            </div>
+            <div class="tags" style="margin-top: 0.85rem;">
+                <span class="tag">Data Structures</span>
+                <span class="tag">Algorithms</span>
+                <span class="tag">Software Engineering</span>
+                <span class="tag">Systems Programming</span>
+                <span class="tag">Cybersecurity Foundations</span>
+                <span class="tag">Digital Logic Design</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technical Skills -->
+    <section>
+        <h2 class="section-title">Technical Expertise</h2>
+        <div class="card">
+            <p style="font-size: 0.95rem; margin-bottom: 0.5rem;"><strong>Languages:</strong> Python, C#, C++, C, JavaScript, SQL, Linux / Bash</p>
+            <p style="font-size: 0.95rem; margin-bottom: 0.5rem;"><strong>Frameworks & Tools:</strong> .NET 8, SQLite, Git, GitHub, VS Code, REST APIs, Flask</p>
+            <p style="font-size: 0.95rem;"><strong>Specializations:</strong> OOP, Relational Database Architecture, Hardware Triage, Networking, IT Security</p>
+        </div>
+    </section>
+
+    <!-- Featured Projects -->
+    <section>
+        <h2 class="section-title">Featured Projects</h2>
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title">SafeRide — Chauffeur Service Platform</h3>
+                    <p class="card-subtitle">Database Architect & Backend Developer</p>
+                </div>
+                <span class="card-date">Spring 2026</span>
+            </div>
+            <ul class="bullets">
+                <li>Architected relational database schemas across 3 tables with foreign key constraints, cascade deletions, and license plate validations.</li>
+                <li>Built a parameterized C# data access layer with multi-table JOIN operations, slashing dashboard data-assembly logic by ~60%.</li>
+                <li>Secured authentication flows by implementing BCrypt.Net-Next salted password hashing aligned with OWASP guidelines.</li>
+                <li>Refactored query logic into modular, domain-specific classes to eliminate God-Object anti-patterns across a 4-person Agile team.</li>
+            </ul>
+            <div class="tags">
+                <span class="tag">C#</span>
+                <span class="tag">.NET 8</span>
+                <span class="tag">SQLite</span>
+                <span class="tag">BCrypt</span>
+                <span class="tag">Agile/Scrum</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title">Python Mini Projects & Utilities Lab</h3>
+                    <p class="card-subtitle">Personal Developer Repository</p>
+                </div>
+                <span class="card-date">Active</span>
+            </div>
+            <ul class="bullets">
+                <li>Developed terminal AI assistants leveraging the modern <code>google-genai</code> SDK.</li>
+                <li>Implemented low-level network resolution tools using Python's native <code>socket</code> library.</li>
+                <li>Engineered IP-based geolocation tracking modules consuming external REST APIs.</li>
+            </ul>
+            <div class="tags">
+                <span class="tag">Python</span>
+                <span class="tag">Google GenAI</span>
+                <span class="tag">Sockets</span>
+                <span class="tag">Requests API</span>
+                <span class="tag">Flask</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Experience & Research -->
+    <section>
+        <h2 class="section-title">Experience & Research</h2>
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title">Undergraduate Researcher &bull; UR2PhD Program</h3>
+                    <p class="card-subtitle">UNT Department of Computer Science & Engineering</p>
+                </div>
+                <span class="card-date">Aug 2025 – Present</span>
+            </div>
+            <ul class="bullets">
+                <li>Contributing to a co-authored academic paper investigating computing accessibility barriers and inclusive user-centric technology frameworks.</li>
+                <li>Participating in faculty-led mentorship sessions refining research methodologies and scholarly communications.</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title">Computer Technician &bull; UNT Library Services</h3>
+                    <p class="card-subtitle">University of North Texas</p>
+                </div>
+                <span class="card-date">Feb 2026 – Present</span>
+            </div>
+            <ul class="bullets">
+                <li>Deliver comprehensive hardware and software troubleshooting across Windows and macOS workstations, printers, and campus networks.</li>
+                <li>Enforce campus IT data security compliance during system imaging, hardware deployment, and device provisioning.</li>
+            </ul>
+        </div>
+    </section>
+</div>
+
+</body>
+</html>
+"""
+
+@app.route("/")
+def home():
+    return render_template_string(HTML_TEMPLATE)
+
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=5001)
