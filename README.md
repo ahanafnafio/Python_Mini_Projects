@@ -11,6 +11,7 @@ Each directory contains an independent script or mini-tool designed to run in is
 | `BOT_main.py` | Interactive terminal chatbot utilizing the Gemini API | `google-genai` |
 | `IP_address_main.py` | Command-line utility to resolve domain hostnames to IP addresses | `socket` |
 | `Location_main.py` | IP geolocation lookup tool reporting city, region, and country | `requests`, `ipinfo.io` |
+| `Website_main.py` | Living Portfolio about myself | `requests`, `ipinfo.io` |
 
 
 
